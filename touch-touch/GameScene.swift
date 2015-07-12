@@ -12,23 +12,23 @@ import UIKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
+    var game_over = false
     let shape = SKShapeNode(circleOfRadius: 20)
     let enemy = SKShapeNode(circleOfRadius: 15)
     let time = SKLabelNode(text:"")
-    let tb = SKLabelNode(text: "")
+    let tb = SKLabelNode()
+    //timer vars
     var count = 0
     var start = false
     var timer = NSTimer()
-    
+    //countdown vars
     var dtimer = NSTimer()
     var dcount = 6
- 
-    
+    //collider enum
     enum ColliderType:UInt32{
         case hero = 1
         case badguy = 2
     }
-    
     override func didMoveToView(view: SKView) {
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVectorMake(0, -6)
@@ -37,41 +37,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.backgroundColor = UIColor.whiteColor()
         dtimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("cdtimer"), userInfo: nil, repeats: true)
         timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("updateTimer"), userInfo: nil, repeats: true)
-        addtb()
-        addPlayer()
-        addEnemy()
-        addtimer()
-    }
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
-        for touch in (touches as! Set<UITouch>) {
-            let location = touch.locationInNode(self)
-            let move = SKAction.moveTo(location, duration: 1.0)
-            let move_enemy = SKAction.moveTo(location, duration: 1.6)
-            shape.runAction(move)
-            enemy.runAction(move_enemy)
-        }
-    }
-    
-    func updateTimer(){
-        if start == true{
-            count += 1
-            time.text = "Timer: "+String(count)
-        }
-    }
-    
-    func cdtimer(){
-        if dcount > 0{
-            dcount -= 1
-            tb.text = String(dcount)
-            self.view!.userInteractionEnabled = false
-        }else{
-            start = true
-            tb.text = ""
-            self.view!.userInteractionEnabled = true
-        }
-    }
-    
-    func addPlayer(){
         
         shape.zPosition = 1
         shape.fillColor = UIColor.blueColor()
@@ -85,8 +50,45 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         shape.physicsBody!.collisionBitMask = ColliderType.badguy.rawValue
         
         self.addChild(shape)
+        
+        addtb()
+        addEnemy()
+        addtimer()
+    }
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
+        for touch in (touches as! Set<UITouch>) {
+            if game_over == false{
+                let location = touch.locationInNode(self)
+                let move = SKAction.moveTo(location, duration: 1.0)
+                let move_enemy = SKAction.moveTo(location, duration: 1.6)
+                shape.runAction(move)
+                enemy.runAction(move_enemy)
+                tb.text = ""
+            }else if game_over == true{
+                self.view!.userInteractionEnabled = false
+            }
+        }
     }
     
+    func updateTimer(){
+        if start == true{
+            count += 1
+            time.text = "Timer: "+String(count)
+        }
+    }
+    
+    func cdtimer(){
+        game_over = false
+        if dcount > 0{
+            dcount -= 1
+            tb.text = String(dcount)
+            self.view!.userInteractionEnabled = false
+        }else if dcount==0 && game_over == false{
+            start = true
+            self.view!.userInteractionEnabled = true
+        }
+    }
+
     func addEnemy(){
         
         enemy.zPosition = 1
@@ -102,6 +104,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func addtimer(){
+        
         time.position = CGPoint(x: CGRectGetMidX(self.frame)-160, y: CGRectGetMidY(self.frame)+360)
         time.fontName = "Arial"
         time.fontSize = 24
@@ -112,8 +115,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func addtb(){
-        
-        // configure touhch to begin node
+
         tb.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame))
         tb.fontName = "Arial"
         tb.zPosition = 2
@@ -125,7 +127,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
 
     func didBeginContact(contact: SKPhysicsContact) {
         println("COLLISION")
+        game_over = true
         timer.invalidate()
+        gameover()
+    }
+    func gameover(){
+        if game_over == true{
+            self.view!.userInteractionEnabled = false
+            tb.fontSize = 50
+        }
     }
 
     override func update(currentTime: CFTimeInterval) {
