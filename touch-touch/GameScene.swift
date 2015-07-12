@@ -8,14 +8,21 @@
 //
 
 import SpriteKit
+import UIKit
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
     
     let shape = SKShapeNode(circleOfRadius: 20)
     let enemy = SKShapeNode(circleOfRadius: 15)
-    var score = 0
-    let health = SKLabelNode(text:"")
-    let tb = SKLabelNode(text: "Touch to Begin")
+    let time = SKLabelNode(text:"")
+    let tb = SKLabelNode(text: "")
+    var count = 0
+    var start = false
+    var timer = NSTimer()
+    
+    var dtimer = NSTimer()
+    var dcount = 6
+ 
     
     enum ColliderType:UInt32{
         case hero = 1
@@ -25,32 +32,43 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     override func didMoveToView(view: SKView) {
         self.physicsWorld.contactDelegate = self
         self.physicsWorld.gravity = CGVectorMake(0, -6)
-        let physicsBody = SKPhysicsBody (edgeLoopFromRect: self.frame)
+        let  physicsBody = SKPhysicsBody (edgeLoopFromRect: self.frame)
         self.physicsBody = physicsBody
         self.backgroundColor = UIColor.whiteColor()
-        
-        addTextNodes()
+        dtimer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("cdtimer"), userInfo: nil, repeats: true)
+        timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("updateTimer"), userInfo: nil, repeats: true)
+        addtb()
         addPlayer()
         addEnemy()
+        addtimer()
+    }
+    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
+        for touch in (touches as! Set<UITouch>) {
+            let location = touch.locationInNode(self)
+            let move = SKAction.moveTo(location, duration: 1.0)
+            let move_enemy = SKAction.moveTo(location, duration: 1.6)
+            shape.runAction(move)
+            enemy.runAction(move_enemy)
+        }
     }
     
-    func addTextNodes(){
-        // configure health node
-        health.position = CGPoint(x: CGRectGetMidX(self.frame)-200, y: CGRectGetMidY(self.frame)+360)
-        health.fontName = "Arial"
-        health.fontSize = 24
-        health.fontColor = UIColor.whiteColor()
-        health.text = String(score)
-        
-        // configure touhch to begin node
-        tb.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame))
-        tb.fontName = "Arial"
-        tb.zPosition = 2
-        tb.fontSize = 65
-        tb.fontColor = UIColor.blueColor()
-        
-        self.addChild(tb)
-        self.addChild(health)
+    func updateTimer(){
+        if start == true{
+            count += 1
+            time.text = "Timer: "+String(count)
+        }
+    }
+    
+    func cdtimer(){
+        if dcount > 0{
+            dcount -= 1
+            tb.text = String(dcount)
+            self.view!.userInteractionEnabled = false
+        }else{
+            start = true
+            tb.text = ""
+            self.view!.userInteractionEnabled = true
+        }
     }
     
     func addPlayer(){
@@ -83,26 +101,33 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         self.addChild(enemy)
     }
     
+    func addtimer(){
+        time.position = CGPoint(x: CGRectGetMidX(self.frame)-160, y: CGRectGetMidY(self.frame)+360)
+        time.fontName = "Arial"
+        time.fontSize = 24
+        time.fontColor = UIColor.blackColor()
+        time.text = ""
+        
+        self.addChild(time)
+    }
+    
+    func addtb(){
+        
+        // configure touhch to begin node
+        tb.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame))
+        tb.fontName = "Arial"
+        tb.zPosition = 2
+        tb.fontSize = 120
+        tb.fontColor = UIColor.blackColor()
+        
+        self.addChild(tb)
+    }
+
     func didBeginContact(contact: SKPhysicsContact) {
         println("COLLISION")
-        over()
-        
+        timer.invalidate()
     }
-    func over(){
-        // TODO add collision actions
-    }
-    
-    override func touchesBegan(touches: Set<NSObject>, withEvent event: UIEvent) {
-        for touch in (touches as! Set<UITouch>) {
-            let location = touch.locationInNode(self)
-            let move = SKAction.moveTo(location, duration: 1.0)
-            let move_enemy = SKAction.moveTo(location, duration: 1.6)
-            shape.runAction(move)
-            enemy.runAction(move_enemy)
-            tb.text=""
-        }
-    }
-    
+
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
     }
