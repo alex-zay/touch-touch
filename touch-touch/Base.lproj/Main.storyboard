@@ -18,11 +18,15 @@
                         <subviews>
                             <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="zIf-rt-BXf">
                                 <rect key="frame" x="277" y="285" width="30" height="30"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="30"/>
                                 <state key="normal" title="Play">
                                     <color key="titleShadowColor" white="0.5" alpha="1" colorSpace="calibratedWhite"/>
                                 </state>
+                                <variation key="widthClass=compact" misplaced="YES">
+                                    <rect key="frame" x="160" y="274" width="80" height="52"/>
+                                </variation>
                                 <connections>
-                                    <segue destination="BV1-FR-VrT" kind="modal" id="aYr-jd-g25"/>
+                                    <segue destination="BV1-FR-VrT" kind="presentation" id="JuN-RQ-NuP"/>
                                 </connections>
                             </button>
                         </subviews>
@@ -30,12 +34,26 @@
                         <constraints>
                             <constraint firstAttribute="centerX" secondItem="zIf-rt-BXf" secondAttribute="centerX" id="DlX-N6-cb1"/>
                             <constraint firstAttribute="centerY" secondItem="zIf-rt-BXf" secondAttribute="centerY" id="XQV-9Y-hue"/>
+                            <constraint firstAttribute="centerX" secondItem="zIf-rt-BXf" secondAttribute="centerX" id="bOS-jw-5Mc"/>
+                            <constraint firstAttribute="centerY" secondItem="zIf-rt-BXf" secondAttribute="centerY" id="ivM-94-sDs"/>
                         </constraints>
+                        <variation key="default">
+                            <mask key="constraints">
+                                <exclude reference="bOS-jw-5Mc"/>
+                                <exclude reference="ivM-94-sDs"/>
+                            </mask>
+                        </variation>
+                        <variation key="widthClass=compact">
+                            <mask key="constraints">
+                                <include reference="bOS-jw-5Mc"/>
+                                <include reference="ivM-94-sDs"/>
+                            </mask>
+                        </variation>
                     </view>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="OAe-dj-FM1" userLabel="First Responder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="-53" y="155"/>
+            <point key="canvasLocation" x="-54" y="155"/>
         </scene>
         <!--Game View Controller-->
         <scene sceneID="tXr-a1-R10">
