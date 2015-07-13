@@ -65,7 +65,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
                 enemy.runAction(move_enemy)
                 tb.text = ""
             }else if game_over == true{
-                self.view!.userInteractionEnabled = false
+                self.removeAllActions()
             }
         }
     }
@@ -78,7 +78,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func cdtimer(){
-        game_over = false
+        game_over == false
         if dcount > 0{
             dcount -= 1
             tb.text = String(dcount)
@@ -128,13 +128,15 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     func didBeginContact(contact: SKPhysicsContact) {
         println("COLLISION")
         game_over = true
+        let die = SKAction.scaleXTo(0, y: 0, duration: 1.0)
+        shape.runAction(die)
         timer.invalidate()
         gameover()
     }
     func gameover(){
         if game_over == true{
-            self.view!.userInteractionEnabled = false
             tb.fontSize = 50
+            tb.text = "Game Over"
         }
     }
 
