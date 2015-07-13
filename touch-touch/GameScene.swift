@@ -16,10 +16,11 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     var game_over = false
     var start = false
     var moved = false
+    
     //entities
     let shape = SKShapeNode(circleOfRadius: 20)
     let enemy = SKShapeNode(circleOfRadius: 15)
-    let time = SKLabelNode(text:"")
+    let time = UILabel(frame: CGRectMake(0, 0, 100, 50))
     let tb = SKLabelNode()
     let restart = UIButton.buttonWithType(UIButtonType.System) as! UIButton
     
@@ -46,7 +47,7 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("updateTimer"), userInfo: nil, repeats: true)
         shape.zPosition = 1
         shape.fillColor = UIColor.blueColor()
-        shape.lineWidth = 4
+        shape.lineWidth = 0
         shape.position = CGPoint (x:CGRectGetMidX(self.frame),y:CGRectGetMidY(self.frame))
         shape.physicsBody = SKPhysicsBody(circleOfRadius: 20.0);
         shape.physicsBody!.dynamic = true
@@ -117,14 +118,10 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
     }
     
     func addtimer(){
-        
-        time.position = CGPoint(x: CGRectGetMidX(self.frame)-160, y: CGRectGetMidY(self.frame)+360)
-        time.fontName = "Arial"
-        time.fontSize = 24
-        time.fontColor = UIColor.blackColor()
+        time.center = CGPointMake(40, CGRectGetMidY(self.frame)-370)
+        time.textAlignment = NSTextAlignment.Center
         time.text = ""
-        
-        self.addChild(time)
+        self.view!.addSubview(time)
     }
     
     func addtb(){
@@ -172,7 +169,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         shape.position = CGPoint (x:CGRectGetMidX(self.frame),y:CGRectGetMidY(self.frame))
         timer = NSTimer.scheduledTimerWithTimeInterval(1, target: self, selector: Selector("updateTimer"), userInfo: nil, repeats: true)
     }
-
     override func update(currentTime: CFTimeInterval) {
         /* Called before each frame is rendered */
     }
