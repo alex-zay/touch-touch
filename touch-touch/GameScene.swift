@@ -9,29 +9,26 @@
 
 import SpriteKit
 import UIKit
+import Social
 
 class GameScene: SKScene, SKPhysicsContactDelegate {
-    
     //booleans
     var game_over = false
     var start = false
     var moved = false
-    
     //entities
     let shape = SKShapeNode(circleOfRadius: 20)
     let enemy = SKShapeNode(circleOfRadius: 15)
+    let ball = SKShapeNode(circleOfRadius: 15)
     let time = UILabel(frame: CGRectMake(0, 0, 100, 50))
     let tb = SKLabelNode()
     let restart = UIButton.buttonWithType(UIButtonType.System) as! UIButton
-    
     //timer vars
     var count = 0
     var timer = NSTimer()
-    
     //countdown vars
     var dtimer = NSTimer()
     var dcount = 6
-    
     //collider enum
     enum ColliderType:UInt32{
         case hero = 1
@@ -76,7 +73,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             }
         }
     }
-    
     func updateTimer(){
         if start == true && game_over == false{
             count += 1
@@ -88,7 +84,6 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             count = -1
         }
     }
-    
     func cdtimer(){
         if dcount > 0 && game_over == false{
             dcount -= 1
@@ -102,9 +97,23 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             enemy.runAction(move_e)
         }
     }
-
-    func addEnemy(){
+    func addtimer(){
+        time.center = CGPointMake(40, CGRectGetMidY(self.frame)-370)
+        time.textAlignment = NSTextAlignment.Center
+        time.text = ""
+        self.view!.addSubview(time)
+    }
+    func addtb(){
         
+        tb.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame)+30)
+        tb.fontName = "Arial"
+        tb.zPosition = 2
+        tb.fontSize = 120
+        tb.fontColor = UIColor.blackColor()
+        
+        self.addChild(tb)
+    }
+    func addEnemy(){
         enemy.zPosition = 1
         enemy.fillColor = UIColor.redColor()
         enemy.lineWidth = 0
@@ -116,34 +125,17 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
         
         self.addChild(enemy)
     }
-    
-    func addtimer(){
-        time.center = CGPointMake(40, CGRectGetMidY(self.frame)-370)
-        time.textAlignment = NSTextAlignment.Center
-        time.text = ""
-        self.view!.addSubview(time)
-    }
-    
-    func addtb(){
-
-        tb.position = CGPoint(x: CGRectGetMidX(self.frame), y: CGRectGetMidY(self.frame)+30)
-        tb.fontName = "Arial"
-        tb.zPosition = 2
-        tb.fontSize = 120
-        tb.fontColor = UIColor.blackColor()
+    func addballs(){
+        ball.zPosition = 1
+        ball.fillColor = UIColor.greenColor()
+        ball.lineWidth = 0
+        ball.position = CGPoint (x:CGRectGetMaxX(self.frame),y:CGRectGetMaxY(self.frame))
+        ball.physicsBody = SKPhysicsBody(circleOfRadius: 15.0);
+        ball.physicsBody!.dynamic = true
+        ball.physicsBody!.affectedByGravity = true
+        ball.physicsBody!.categoryBitMask = ColliderType.badguy.rawValue
         
-        self.addChild(tb)
-    }
-
-    func didBeginContact(contact: SKPhysicsContact) {
-        println("COLLISION")
-        game_over = true
-        //let die = SKAction.scaleXTo(0, y: 0, duration: 1.0)
-        //shape.runAction(die)
-        if game_over == true{
-            timer.invalidate()
-        }
-        gameover()
+        self.addChild(ball)
     }
     func gameover(){
         if game_over == true{
@@ -155,7 +147,19 @@ class GameScene: SKScene, SKPhysicsContactDelegate {
             restart.setTitleColor(UIColor.blueColor(), forState: .Normal)
             restart.addTarget(self, action: "playagain", forControlEvents: UIControlEvents.TouchUpInside)
             self.view!.addSubview(restart)
-            
+        }
+    }
+    func didBeginContact(contact: SKPhysicsContact) {
+        let contactMask = contact.bodyA.categoryBitMask | contact.bodyB.categoryBitMask
+        switch(contactMask){
+        case ColliderType.hero.rawValue | ColliderType.badguy.rawValue:
+            game_over = true
+            if game_over == true{
+                timer.invalidate()
+            }
+            gameover()
+        default:
+            0
         }
     }
     func playagain(){
